@@ -97,5 +97,23 @@ namespace StandUpReminder.Properties {
                 return ((System.Drawing.Icon)(obj));
             }
         }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Pause.
+        /// </summary>
+        internal static string PauseLabel {
+            get {
+                return ResourceManager.GetString("PauseLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unpause.
+        /// </summary>
+        internal static string UnpauseLabel {
+            get {
+                return ResourceManager.GetString("UnpauseLabel", resourceCulture);
+            }
+        }
     }
 }

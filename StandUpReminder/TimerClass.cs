@@ -38,7 +38,7 @@ namespace StandUpReminder
         private TimerClass()
         {
             _timer = new Timer { Interval = 1000 };
-            _timer.Tick += (sender, args) => TimeEvent.Invoke(this, args);
+            _timer.Tick += (sender, args) => TimeEvent?.Invoke(this, args);
         }
 
         #endregion Constructor

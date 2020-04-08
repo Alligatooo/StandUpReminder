@@ -130,4 +130,10 @@
   <data name="AppIcon2" type="System.Resources.ResXFileRef, System.Windows.Forms">
     <value>..\Resources\AppIcon2.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
   </data>
+  <data name="PauseLabel" xml:space="preserve">
+    <value>Pause</value>
+  </data>
+  <data name="UnpauseLabel" xml:space="preserve">
+    <value>Unpause</value>
+  </data>
 </root>

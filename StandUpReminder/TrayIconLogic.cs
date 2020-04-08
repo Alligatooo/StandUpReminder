@@ -40,7 +40,7 @@ namespace StandUpReminder
             graphics.DrawString(text, new Font("Helvetica", 9), brush, 0, 0);
 
             Pen pen = new Pen(borderColor, width: 1);
-            graphics.DrawRectangle(pen, 0, 0, 16, 16);
+            graphics.DrawRectangle(pen, 0, 0, 15, 15);
 
             IntPtr hIcon = bitmap.GetHicon();
             return Icon.FromHandle(hIcon);

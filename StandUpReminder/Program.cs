@@ -22,14 +22,16 @@ namespace StandUpReminder
 
         private class StandUpReminderApplicationContext : ApplicationContext
         {
-            private NotifyIcon notifyIcon;
-            private ContextMenu defaultContexMenu;
+            private NotifyIcon _notifyIcon;
+            private ContextMenu _defaultContexMenu;
 
-            private bool notificationAlert = true;
+            private bool _notificationAlert = true;
             private TimerClass _timerClass;
 
             //Menus
             private MenuItem _settingsMenu;
+
+            private MenuItem _pauseMenu;
 
             private MenuItem _notificationMenu;
 
@@ -70,7 +72,7 @@ namespace StandUpReminder
                     //While _pause show "P"
                     if (_pause)
                     {
-                        notifyIcon.Icon =
+                        _notifyIcon.Icon =
                             TrayIconLogic.ShowTextWithBorder("P", TrayIconLogic.DefaultTextColor, Color.DeepSkyBlue);
                         return;
                     }
@@ -79,44 +81,60 @@ namespace StandUpReminder
                     if (_currentCount > 60)
                     {
                         int count = _currentCount / 60;
-                        notifyIcon.Icon = TrayIconLogic.ShowText(count.ToString());
+                        _notifyIcon.Icon = TrayIconLogic.ShowText(count.ToString());
                     }
                     else
-                        notifyIcon.Icon = TrayIconLogic.ShowTextWithBorder(_currentCount.ToString(), TrayIconLogic.DefaultTextColor, TrayIconLogic.WarningBorderColor);
+                        _notifyIcon.Icon = TrayIconLogic.ShowTextWithBorder(_currentCount.ToString(), TrayIconLogic.DefaultTextColor, TrayIconLogic.WarningBorderColor);
                 }
             }
 
             private void SendAlert(Stream soundStream)
             {
-                if (!notificationAlert) return;
+                if (!_notificationAlert) return;
                 new SoundPlayer(soundStream).Play();
             }
 
             private void InitMenus()
             {
-                _notificationMenu = new MenuItem("Notification", ChangeNotification) { Checked = true };
+                _notificationMenu = new MenuItem("Notification", OnChangeNotificationClicked) { Checked = true };
 
                 _settingsMenu = new MenuItem("Settings", new MenuItem[]
                 {
                     _notificationMenu
                 });
 
-                defaultContexMenu = new ContextMenu(new MenuItem[]
+                _pauseMenu = new MenuItem(Resources.PauseLabel, OnPausePressed);
+                _defaultContexMenu = new ContextMenu(new MenuItem[]
                 {
-                    new MenuItem("Exit", Exit),
-                    new MenuItem("RestartTimer", RestartTimer),
+                    new MenuItem("OnExitPressed", OnExitPressed),
+                    new MenuItem("OnRestartClicked", OnRestartClicked),
+                    _pauseMenu,
                     _settingsMenu
                 });
 
-                notifyIcon = new NotifyIcon()
+                _notifyIcon = new NotifyIcon()
                 {
                     Icon = Resources.AppIcon,
-                    ContextMenu = defaultContexMenu,
+                    ContextMenu = _defaultContexMenu,
                     Visible = true
                 };
             }
 
-            private void ChangeNotification(object sender, EventArgs e)
+            private void OnPausePressed(object sender, EventArgs e)
+            {
+                if (_pauseMenu.Text.Equals(Resources.PauseLabel))
+                {
+                    _timerClass.TimeEvent -= OnTimeEvent;
+                    _pauseMenu.Text = Resources.UnpauseLabel;
+                }
+                else
+                {
+                    _timerClass.TimeEvent += OnTimeEvent;
+                    _pauseMenu.Text = Resources.PauseLabel;
+                }
+            }
+
+            private void OnChangeNotificationClicked(object sender, EventArgs e)
             {
                 if (_notificationMenu.Checked)
                 {
@@ -127,7 +145,7 @@ namespace StandUpReminder
                     _notificationMenu.Checked = true;
                 }
 
-                notificationAlert = _notificationMenu.Checked;
+                _notificationAlert = _notificationMenu.Checked;
             }
 
             private void StartTask()
@@ -135,28 +153,27 @@ namespace StandUpReminder
                 _timerClass.StartRunning();
             }
 
-            private void RestartTimer(object sender, EventArgs e)
+            private void OnRestartClicked(object sender, EventArgs e)
             {
                 var dialogResult = MessageBox.Show("Do you really want to restart the timer?", "Confirm restart", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    _currentCount = maxTimerActivity;
+                    _currentCount = _pause ? maxTimerPause : maxTimerActivity;
                 }
             }
 
-            private void Exit(object sender, EventArgs eventArgs)
+            private void OnExitPressed(object sender, EventArgs eventArgs)
             {
                 var dialogResult = MessageBox.Show("Do you really want to exit this application?", "Confirm exit",
                     MessageBoxButtons.YesNo);
 
                 if (dialogResult == DialogResult.Yes)
                 {
-                    notifyIcon.Visible = false;
+                    _notifyIcon.Visible = false;
                     this.Dispose();
                     Application.Exit();
                 }
             }
-
         }
     }
 }
