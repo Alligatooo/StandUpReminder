@@ -22,7 +22,7 @@ namespace StandUpReminder
         private static TimerClass _instance;
         private readonly Timer _timer;
 
-        public static TimerClass instance
+        public static TimerClass Instance
         {
             get
             {
@@ -43,7 +43,7 @@ namespace StandUpReminder
         }
         #endregion
 
-        public void startRunning()
+        public void StartRunning()
         {
             lock (this)
             {
@@ -52,7 +52,7 @@ namespace StandUpReminder
             }
         }
 
-        public void stopRunning()
+        public void StopRunning()
         {
             lock (this)
             {

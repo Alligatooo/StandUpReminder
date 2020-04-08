@@ -1,6 +1,7 @@
 ﻿using StandUpReminder.Properties;
 using System;
 using System.Drawing;
+using System.Media;
 using System.Windows.Forms;
 
 namespace StandUpReminder
@@ -20,22 +21,80 @@ namespace StandUpReminder
 
         private class StandUpReminderApplicationContext : ApplicationContext
         {
-            private NotifyIcon notifyIcon = null;
+            private NotifyIcon notifyIcon;
             private ContextMenu defaultContexMenu;
 
             private bool notificationAlert = true;
+            private TimerClass _timerClass;
 
             //Menus
             private MenuItem _settingsMenu;
 
             private MenuItem _notificationMenu;
 
+            private int maxTimerActivity = 3600; //60 min
+            private int maxTimerPause = 300; //5 min
+            private int _currentCount = 20;
+            private bool pause = false;
+
             public StandUpReminderApplicationContext()
             {
                 initMenus();
+                _timerClass = TimerClass.Instance;
+                _timerClass.TimeEvent += OnTimeEvent;
                 StartTask();
             }
 
+            public void OnTimeEvent(object sender, EventArgs e)
+            {
+                lock (this)
+                {
+                    _currentCount--;
+                    if (_currentCount == 0)
+                    {
+                        if (!pause)
+                        {
+                            sendAlert();
+                            _currentCount = maxTimerPause;
+                        }
+                        else
+                        {
+                            _currentCount = maxTimerActivity;
+                        }
+                        pause = !pause;
+                        return;
+                    }
+
+                    //While pause show "P"
+                    if (pause)
+                    {
+                        notifyIcon.Icon =
+                            TrayIconLogic.ShowTextWithBorder("P", TrayIconLogic.DefaultTextColor, Color.DeepSkyBlue);
+                        return;
+                    }
+
+                    //While Activity show time left
+                    if (_currentCount > 60)
+                    {
+                        int count = _currentCount / 60;
+                        notifyIcon.Icon = TrayIconLogic.ShowText(count.ToString());
+                    }
+                    else if (_currentCount <= 60 && _currentCount != 0)
+                    {
+                        notifyIcon.Icon = TrayIconLogic.ShowTextWithBorder(_currentCount.ToString(), TrayIconLogic.DefaultTextColor, TrayIconLogic.WarningBorderColor);
+                    }
+                }
+            }
+
+            private void sendAlert()
+            {
+                bool pause = true;
+                if (!notificationAlert) return;
+                SystemSounds.Beep.Play();
+
+
+                
+            }
             private void initMenus()
             {
                 _notificationMenu = new MenuItem("Notification", ChangeNotification);
@@ -49,7 +108,6 @@ namespace StandUpReminder
                 defaultContexMenu = new ContextMenu(new MenuItem[]
                 {
                     new MenuItem("Exit", Exit),
-                    new MenuItem("ShowRandomText", ShowRandomText),
                     new MenuItem("RestartTimer", RestartTimer),
                     _settingsMenu
                 });
@@ -78,6 +136,7 @@ namespace StandUpReminder
 
             private void StartTask()
             {
+                _timerClass.StartRunning();
             }
 
             private void RestartTimer(object sender, EventArgs e)
@@ -85,37 +144,8 @@ namespace StandUpReminder
                 var dialogResult = MessageBox.Show("Do you really want to restart the timer?", "Confirm restart", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
+                    _currentCount = maxTimerActivity;
                 }
-            }
-
-            private void ShowRandomText(object sender, EventArgs eventArgs)
-            {
-                int randomInt = (new Random().Next(1, 99));
-                ShowText(randomInt + "", Color.White);
-            }
-
-            private void ShowText(string text, Color textColor)
-            {
-                ShowTextWithBorder(text, textColor, Color.LightGreen);
-            }
-
-            private void ShowTextWithBorder(string text, Color textColor, Color borderColor)
-            {
-                Bitmap bitmap = new Bitmap(16, 16);
-
-                Brush brush = new SolidBrush(textColor);
-
-                Graphics graphics = Graphics.FromImage(bitmap);
-                graphics.DrawString(text, new Font("Helvetica", 9), brush, 0, 0);
-
-                Pen pen = new Pen(borderColor, width: 1);
-                graphics.DrawRectangle(pen, 0, 0, 16, 16);
-
-                IntPtr hIcon = bitmap.GetHicon();
-                Icon icon = Icon.FromHandle(hIcon);
-                notifyIcon.Icon.Dispose();
-                notifyIcon.Icon = icon;
-                bitmap.Dispose();
             }
 
             private void Exit(object sender, EventArgs eventArgs)
