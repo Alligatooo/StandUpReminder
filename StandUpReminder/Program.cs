@@ -31,14 +31,16 @@ namespace StandUpReminder
             //Menus
             private MenuItem _settingsMenu;
 
+            private MenuItem _statusMenu;
             private MenuItem _pauseMenu;
 
             private MenuItem _notificationMenu;
 
-            private int maxTimerActivity = 3600; //60 min
-            private int maxTimerPause = 300; //5 min
+            private int _maxTimerActivity = 3600; //60 min
+            private int _maxTimerPause = 300; //5 min
             private int _currentCount = 20;
             private bool _pause = false;
+            private MenuItem _timeLeftMenu;
 
             public StandUpReminderApplicationContext()
             {
@@ -48,22 +50,77 @@ namespace StandUpReminder
                 StartTask();
             }
 
+            private void InitMenus()
+            {
+                //Statusmenuitem "Status: Pause"
+                _statusMenu = new MenuItem("Status: ")
+                {
+                    Break = true,
+                    DefaultItem = true
+                };
+                
+                //TimeLeftMenu "00:00"
+                _timeLeftMenu = new MenuItem();
+
+                //PauseMenu (un-)pauses the timer
+                _pauseMenu = new MenuItem(Resources.PauseLabel, OnPausePressed);
+                
+                //Turn notification on/off
+                _notificationMenu = new MenuItem("Notification", OnChangeNotificationClicked) { Checked = true };
+
+                //SettingsMenu containing notificationMenu
+                _settingsMenu = new MenuItem("Settings", new MenuItem[]
+                {
+                    _notificationMenu
+                });
+
+                _defaultContexMenu = new ContextMenu(new MenuItem[]
+                {
+                    _statusMenu,
+                    _timeLeftMenu,
+                    new MenuItem("-"),
+                    new MenuItem("RestartTimer", OnRestartClicked),
+                    _pauseMenu,
+                    new MenuItem("-"),
+                    _settingsMenu,
+                    new MenuItem("-"),
+                    new MenuItem("Exit", OnExitPressed)
+                });
+
+                _defaultContexMenu.Popup += (sender, args) =>
+                {
+                    _statusMenu.Text = "Status: " + (_pause ? "Pause" : "Running");
+                };
+
+                _notifyIcon = new NotifyIcon()
+                {
+                    Icon = Resources.AppIcon,
+                    ContextMenu = _defaultContexMenu,
+                    Visible = true
+                };
+            }
+
             public void OnTimeEvent(object sender, EventArgs e)
             {
+
                 lock (this)
                 {
                     _currentCount--;
+                    int mins = _currentCount / 60;
+                    int secs = _currentCount % 60;
+                    _timeLeftMenu.Text = $"{mins,0:00}:{secs,0:00}";
+
                     if (_currentCount == 0)
                     {
                         if (!_pause)
                         {
                             SendAlert(Resources.ActivityEnd);
-                            _currentCount = maxTimerPause;
+                            _currentCount = _maxTimerPause;
                         }
                         else
                         {
                             SendAlert(Resources.ActivityStart);
-                            _currentCount = maxTimerActivity;
+                            _currentCount = _maxTimerActivity;
                         }
                         _pause = !_pause;
                         return;
@@ -92,32 +149,6 @@ namespace StandUpReminder
             {
                 if (!_notificationAlert) return;
                 new SoundPlayer(soundStream).Play();
-            }
-
-            private void InitMenus()
-            {
-                _notificationMenu = new MenuItem("Notification", OnChangeNotificationClicked) { Checked = true };
-
-                _settingsMenu = new MenuItem("Settings", new MenuItem[]
-                {
-                    _notificationMenu
-                });
-
-                _pauseMenu = new MenuItem(Resources.PauseLabel, OnPausePressed);
-                _defaultContexMenu = new ContextMenu(new MenuItem[]
-                {
-                    new MenuItem("OnExitPressed", OnExitPressed),
-                    new MenuItem("OnRestartClicked", OnRestartClicked),
-                    _pauseMenu,
-                    _settingsMenu
-                });
-
-                _notifyIcon = new NotifyIcon()
-                {
-                    Icon = Resources.AppIcon,
-                    ContextMenu = _defaultContexMenu,
-                    Visible = true
-                };
             }
 
             private void OnPausePressed(object sender, EventArgs e)
@@ -158,7 +189,7 @@ namespace StandUpReminder
                 var dialogResult = MessageBox.Show("Do you really want to restart the timer?", "Confirm restart", MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    _currentCount = _pause ? maxTimerPause : maxTimerActivity;
+                    _currentCount = _pause ? _maxTimerPause : _maxTimerActivity;
                 }
             }
 
