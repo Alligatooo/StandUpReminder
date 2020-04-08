@@ -33,7 +33,7 @@ namespace StandUpReminder.Properties {
         }
         
         /// <summary>
-        ///   Returns the cached ResourceManager Instance used by this class.
+        ///   Returns the cached ResourceManager instance used by this class.
         /// </summary>
         [global::System.ComponentModel.EditorBrowsableAttribute(global::System.ComponentModel.EditorBrowsableState.Advanced)]
         internal static global::System.Resources.ResourceManager ResourceManager {
@@ -57,6 +57,24 @@ namespace StandUpReminder.Properties {
             }
             set {
                 resourceCulture = value;
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream ActivityEnd {
+            get {
+                return ResourceManager.GetStream("ActivityEnd", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized resource of type System.IO.UnmanagedMemoryStream similar to System.IO.MemoryStream.
+        /// </summary>
+        internal static System.IO.UnmanagedMemoryStream ActivityStart {
+            get {
+                return ResourceManager.GetStream("ActivityStart", resourceCulture);
             }
         }
         

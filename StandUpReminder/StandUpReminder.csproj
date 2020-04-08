@@ -79,6 +79,11 @@
   <ItemGroup>
     <None Include="Resources\AppIcon2.ico" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <None Include="Resources\ActivityEnd.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ActivityStart.wav" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

@@ -1,6 +1,7 @@
 ﻿using StandUpReminder.Properties;
 using System;
 using System.Drawing;
+using System.IO;
 using System.Media;
 using System.Windows.Forms;
 
@@ -35,11 +36,11 @@ namespace StandUpReminder
             private int maxTimerActivity = 3600; //60 min
             private int maxTimerPause = 300; //5 min
             private int _currentCount = 20;
-            private bool pause = false;
+            private bool _pause = false;
 
             public StandUpReminderApplicationContext()
             {
-                initMenus();
+                InitMenus();
                 _timerClass = TimerClass.Instance;
                 _timerClass.TimeEvent += OnTimeEvent;
                 StartTask();
@@ -52,21 +53,22 @@ namespace StandUpReminder
                     _currentCount--;
                     if (_currentCount == 0)
                     {
-                        if (!pause)
+                        if (!_pause)
                         {
-                            sendAlert();
+                            SendAlert(Resources.ActivityEnd);
                             _currentCount = maxTimerPause;
                         }
                         else
                         {
+                            SendAlert(Resources.ActivityStart);
                             _currentCount = maxTimerActivity;
                         }
-                        pause = !pause;
+                        _pause = !_pause;
                         return;
                     }
 
-                    //While pause show "P"
-                    if (pause)
+                    //While _pause show "P"
+                    if (_pause)
                     {
                         notifyIcon.Icon =
                             TrayIconLogic.ShowTextWithBorder("P", TrayIconLogic.DefaultTextColor, Color.DeepSkyBlue);
@@ -79,26 +81,20 @@ namespace StandUpReminder
                         int count = _currentCount / 60;
                         notifyIcon.Icon = TrayIconLogic.ShowText(count.ToString());
                     }
-                    else if (_currentCount <= 60 && _currentCount != 0)
-                    {
+                    else
                         notifyIcon.Icon = TrayIconLogic.ShowTextWithBorder(_currentCount.ToString(), TrayIconLogic.DefaultTextColor, TrayIconLogic.WarningBorderColor);
-                    }
                 }
             }
 
-            private void sendAlert()
+            private void SendAlert(Stream soundStream)
             {
-                bool pause = true;
                 if (!notificationAlert) return;
-                SystemSounds.Beep.Play();
-
-
-                
+                new SoundPlayer(soundStream).Play();
             }
-            private void initMenus()
+
+            private void InitMenus()
             {
-                _notificationMenu = new MenuItem("Notification", ChangeNotification);
-                _notificationMenu.Checked = true;
+                _notificationMenu = new MenuItem("Notification", ChangeNotification) { Checked = true };
 
                 _settingsMenu = new MenuItem("Settings", new MenuItem[]
                 {
@@ -156,9 +152,11 @@ namespace StandUpReminder
                 if (dialogResult == DialogResult.Yes)
                 {
                     notifyIcon.Visible = false;
+                    this.Dispose();
                     Application.Exit();
                 }
             }
+
         }
     }
 }

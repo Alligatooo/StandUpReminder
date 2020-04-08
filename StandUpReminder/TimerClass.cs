@@ -3,9 +3,8 @@ using System.Windows.Forms;
 
 namespace StandUpReminder
 {
-    class TimerClass
+    internal class TimerClass
     {
-
         public EventHandler<EventArgs> TimeEvent;
 
         public bool Running
@@ -35,13 +34,14 @@ namespace StandUpReminder
         }
 
         #region Constructor
+
         private TimerClass()
         {
-            _timer = new Timer();
-            _timer.Interval = 1000;
+            _timer = new Timer { Interval = 1000 };
             _timer.Tick += (sender, args) => TimeEvent.Invoke(this, args);
         }
-        #endregion
+
+        #endregion Constructor
 
         public void StartRunning()
         {
@@ -60,6 +60,5 @@ namespace StandUpReminder
                 _timer.Stop();
             }
         }
-
     }
 }
