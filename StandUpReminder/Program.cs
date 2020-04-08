@@ -89,7 +89,7 @@ namespace StandUpReminder
 
                 _defaultContexMenu.Popup += (sender, args) =>
                 {
-                    _statusMenu.Text = "Status: " + (_pause ? "Pause" : "Running");
+                    _statusMenu.Text = "Status: " + (_pause ? Resources.PauseLabel : "Running");
                 };
 
                 _notifyIcon = new NotifyIcon()
@@ -100,15 +100,13 @@ namespace StandUpReminder
                 };
             }
 
-            public void OnTimeEvent(object sender, EventArgs e)
+            private void OnTimeEvent(object sender, EventArgs e)
             {
 
                 lock (this)
                 {
                     _currentCount--;
-                    int mins = _currentCount / 60;
-                    int secs = _currentCount % 60;
-                    _timeLeftMenu.Text = $"{mins,0:00}:{secs,0:00}";
+                    _timeLeftMenu.Text = $@"{(_currentCount/60),0:00}:{(_currentCount % 60),0:00}";
 
                     if (_currentCount == 0)
                     {
