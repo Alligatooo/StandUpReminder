@@ -23,13 +23,35 @@ namespace StandUpReminder
             private NotifyIcon notifyIcon = null;
             private ContextMenu defaultContexMenu;
 
+            private bool notificationAlert = true;
+
+            //Menus
+            private MenuItem _settingsMenu;
+
+            private MenuItem _notificationMenu;
+
             public StandUpReminderApplicationContext()
             {
+                initMenus();
+                StartTask();
+            }
+
+            private void initMenus()
+            {
+                _notificationMenu = new MenuItem("Notification", ChangeNotification);
+                _notificationMenu.Checked = true;
+
+                _settingsMenu = new MenuItem("Settings", new MenuItem[]
+                {
+                    _notificationMenu
+                });
+
                 defaultContexMenu = new ContextMenu(new MenuItem[]
                 {
                     new MenuItem("Exit", Exit),
                     new MenuItem("ShowRandomText", ShowRandomText),
-                    new MenuItem("RestartTimer", RestartTimer)
+                    new MenuItem("RestartTimer", RestartTimer),
+                    _settingsMenu
                 });
 
                 notifyIcon = new NotifyIcon()
@@ -38,12 +60,24 @@ namespace StandUpReminder
                     ContextMenu = defaultContexMenu,
                     Visible = true
                 };
-                StartTask();
+            }
+
+            private void ChangeNotification(object sender, EventArgs e)
+            {
+                if (_notificationMenu.Checked)
+                {
+                    _notificationMenu.Checked = false;
+                }
+                else
+                {
+                    _notificationMenu.Checked = true;
+                }
+
+                notificationAlert = _notificationMenu.Checked;
             }
 
             private void StartTask()
             {
-                
             }
 
             private void RestartTimer(object sender, EventArgs e)
@@ -56,8 +90,8 @@ namespace StandUpReminder
 
             private void ShowRandomText(object sender, EventArgs eventArgs)
             {
-                int randomInt = (new Random().Next(1,99));
-                ShowText(randomInt+"", Color.White);
+                int randomInt = (new Random().Next(1, 99));
+                ShowText(randomInt + "", Color.White);
             }
 
             private void ShowText(string text, Color textColor)
@@ -83,7 +117,7 @@ namespace StandUpReminder
                 notifyIcon.Icon = icon;
                 bitmap.Dispose();
             }
-            
+
             private void Exit(object sender, EventArgs eventArgs)
             {
                 var dialogResult = MessageBox.Show("Do you really want to exit this application?", "Confirm exit",
@@ -94,7 +128,6 @@ namespace StandUpReminder
                     notifyIcon.Visible = false;
                     Application.Exit();
                 }
-
             }
         }
     }
