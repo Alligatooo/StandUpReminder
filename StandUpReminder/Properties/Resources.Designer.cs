@@ -99,11 +99,56 @@ namespace StandUpReminder.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Confirm exit.
+        /// </summary>
+        internal static string ExitCaptionMessageBox {
+            get {
+                return ResourceManager.GetString("ExitCaptionMessageBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you really want to exit this application?.
+        /// </summary>
+        internal static string ExitQuestionMessageBox {
+            get {
+                return ResourceManager.GetString("ExitQuestionMessageBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Pause.
         /// </summary>
         internal static string PauseLabel {
             get {
                 return ResourceManager.GetString("PauseLabel", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Confirm restart.
+        /// </summary>
+        internal static string RestartCaptionMessageBox {
+            get {
+                return ResourceManager.GetString("RestartCaptionMessageBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Do you really want to restart the timer?.
+        /// </summary>
+        internal static string RestartQuestionMessageBox {
+            get {
+                return ResourceManager.GetString("RestartQuestionMessageBox", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Status: .
+        /// </summary>
+        internal static string StatusLabel {
+            get {
+                return ResourceManager.GetString("StatusLabel", resourceCulture);
             }
         }
         

@@ -23,10 +23,10 @@ namespace StandUpReminder
         private class StandUpReminderApplicationContext : ApplicationContext
         {
             private NotifyIcon _notifyIcon;
-            private ContextMenu _defaultContexMenu;
+            private ContextMenu _defaultContextMenu;
 
             private bool _notificationAlert = true;
-            private TimerClass _timerClass;
+            private readonly TimerClass _timerClass;
 
             //Menus
             private MenuItem _settingsMenu;
@@ -36,10 +36,10 @@ namespace StandUpReminder
 
             private MenuItem _notificationMenu;
 
-            private int _maxTimerActivity = 3600; //60 min
-            private int _maxTimerPause = 300; //5 min
+            private const int MaxTimerActivity = 3600; //60 min
+            private const int MaxTimerPause = 300; //5 min
             private int _currentCount = 20;
-            private bool _pause = false;
+            private bool _pause;
             private MenuItem _timeLeftMenu;
 
             public StandUpReminderApplicationContext()
@@ -53,7 +53,7 @@ namespace StandUpReminder
             private void InitMenus()
             {
                 //Statusmenuitem "Status: Pause"
-                _statusMenu = new MenuItem("Status: ")
+                _statusMenu = new MenuItem(Resources.StatusLabel)
                 {
                     Break = true,
                     DefaultItem = true
@@ -69,12 +69,12 @@ namespace StandUpReminder
                 _notificationMenu = new MenuItem("Notification", OnChangeNotificationClicked) { Checked = true };
 
                 //SettingsMenu containing notificationMenu
-                _settingsMenu = new MenuItem("Settings", new MenuItem[]
+                _settingsMenu = new MenuItem("Settings", new[]
                 {
                     _notificationMenu
                 });
 
-                _defaultContexMenu = new ContextMenu(new MenuItem[]
+                _defaultContextMenu = new ContextMenu(new[]
                 {
                     _statusMenu,
                     _timeLeftMenu,
@@ -87,15 +87,15 @@ namespace StandUpReminder
                     new MenuItem("Exit", OnExitPressed)
                 });
 
-                _defaultContexMenu.Popup += (sender, args) =>
+                _defaultContextMenu.Popup += (sender, args) =>
                 {
-                    _statusMenu.Text = "Status: " + (_pause ? Resources.PauseLabel : "Running");
+                    _statusMenu.Text = Resources.StatusLabel + (_pause ? Resources.PauseLabel : "Running");
                 };
 
                 _notifyIcon = new NotifyIcon()
                 {
                     Icon = Resources.AppIcon,
-                    ContextMenu = _defaultContexMenu,
+                    ContextMenu = _defaultContextMenu,
                     Visible = true
                 };
             }
@@ -113,12 +113,12 @@ namespace StandUpReminder
                         if (!_pause)
                         {
                             SendAlert(Resources.ActivityEnd);
-                            _currentCount = _maxTimerPause;
+                            _currentCount = MaxTimerPause;
                         }
                         else
                         {
                             SendAlert(Resources.ActivityStart);
-                            _currentCount = _maxTimerActivity;
+                            _currentCount = MaxTimerActivity;
                         }
                         _pause = !_pause;
                         return;
@@ -184,16 +184,16 @@ namespace StandUpReminder
 
             private void OnRestartClicked(object sender, EventArgs e)
             {
-                var dialogResult = MessageBox.Show("Do you really want to restart the timer?", "Confirm restart", MessageBoxButtons.YesNo);
+                var dialogResult = MessageBox.Show(Resources.RestartQuestionMessageBox, Resources.RestartCaptionMessageBox, MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    _currentCount = _pause ? _maxTimerPause : _maxTimerActivity;
+                    _currentCount = _pause ? MaxTimerPause : MaxTimerActivity;
                 }
             }
 
             private void OnExitPressed(object sender, EventArgs eventArgs)
             {
-                var dialogResult = MessageBox.Show("Do you really want to exit this application?", "Confirm exit",
+                var dialogResult = MessageBox.Show(Resources.ExitQuestionMessageBox, Resources.ExitCaptionMessageBox,
                     MessageBoxButtons.YesNo);
 
                 if (dialogResult == DialogResult.Yes)

@@ -136,4 +136,19 @@
   <data name="UnpauseLabel" xml:space="preserve">
     <value>Unpause</value>
   </data>
+  <data name="StatusLabel" xml:space="preserve">
+    <value>Status: </value>
+  </data>
+  <data name="RestartQuestionMessageBox" xml:space="preserve">
+    <value>Do you really want to restart the timer?</value>
+  </data>
+  <data name="RestartCaptionMessageBox" xml:space="preserve">
+    <value>Confirm restart</value>
+  </data>
+  <data name="ExitQuestionMessageBox" xml:space="preserve">
+    <value>Do you really want to exit this application?</value>
+  </data>
+  <data name="ExitCaptionMessageBox" xml:space="preserve">
+    <value>Confirm exit</value>
+  </data>
 </root>
