@@ -151,4 +151,7 @@
   <data name="ExitCaptionMessageBox" xml:space="preserve">
     <value>Confirm exit</value>
   </data>
+  <data name="Stretching" type="System.Resources.ResXFileRef, System.Windows.Forms">
+    <value>..\Resources\Stretching.ico;System.Drawing.Icon, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a</value>
+  </data>
 </root>

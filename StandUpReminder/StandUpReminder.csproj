@@ -89,6 +89,7 @@
     <None Include="Resources\ActivityStart.wav" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Resources\Stretching.ico" />
     <Content Include="Stretching.ico" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

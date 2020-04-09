@@ -29,18 +29,21 @@ namespace StandUpReminder
             private readonly TimerClass _timerClass;
 
             //Menus
-            private MenuItem _settingsMenu;
 
             private MenuItem _statusMenu;
+            private MenuItem _timeLeftMenu;
+            
             private MenuItem _pauseMenu;
-
+            
+            private MenuItem _symbolMenu;
             private MenuItem _notificationMenu;
+            private MenuItem _settingsMenu;
 
             private const int MaxTimerActivity = 3600; //60 min
             private const int MaxTimerPause = 300; //5 min
             private int _currentCount = 20;
             private bool _pause;
-            private MenuItem _timeLeftMenu;
+            private bool _showTimer = true;
 
             public StandUpReminderApplicationContext()
             {
@@ -68,10 +71,13 @@ namespace StandUpReminder
                 //Turn notification on/off
                 _notificationMenu = new MenuItem("Notification", OnChangeNotificationClicked) { Checked = true };
 
+                _symbolMenu = new MenuItem("Show time", OnSymbolChange){Checked = true};
+
                 //SettingsMenu containing notificationMenu
                 _settingsMenu = new MenuItem("Settings", new[]
                 {
-                    _notificationMenu
+                    _notificationMenu,
+                    _symbolMenu
                 });
 
                 _defaultContextMenu = new ContextMenu(new[]
@@ -100,6 +106,13 @@ namespace StandUpReminder
                 };
             }
 
+            private void OnSymbolChange(object sender, EventArgs e)
+            {
+                _symbolMenu.Text = _symbolMenu.Checked ? "Show icon" : "Show time";
+                _symbolMenu.Checked = !_symbolMenu.Checked;
+                _showTimer = _symbolMenu.Checked;
+            }
+
             private void OnTimeEvent(object sender, EventArgs e)
             {
 
@@ -124,22 +137,31 @@ namespace StandUpReminder
                         return;
                     }
 
-                    //While _pause show "P"
-                    if (_pause)
+                    if (_showTimer)
                     {
-                        _notifyIcon.Icon =
-                            TrayIconLogic.ShowTextWithBorder("P", TrayIconLogic.DefaultTextColor, Color.DeepSkyBlue);
-                        return;
-                    }
+                        //While _pause show "P"
+                        if (_pause)
+                        {
+                            _notifyIcon.Icon =
+                                TrayIconLogic.ShowTextWithBorder("P", TrayIconLogic.DefaultTextColor,
+                                    Color.DeepSkyBlue);
+                            return;
+                        }
 
-                    //While Activity show time left
-                    if (_currentCount > 60)
-                    {
-                        int count = _currentCount / 60;
-                        _notifyIcon.Icon = TrayIconLogic.ShowText(count.ToString());
+                        //While Activity show time left
+                        if (_currentCount > 60)
+                        {
+                            int count = _currentCount / 60;
+                            _notifyIcon.Icon = TrayIconLogic.ShowText(count.ToString());
+                        }
+                        else
+                            _notifyIcon.Icon = TrayIconLogic.ShowTextWithBorder(_currentCount.ToString(),
+                                TrayIconLogic.DefaultTextColor, TrayIconLogic.WarningBorderColor);
                     }
                     else
-                        _notifyIcon.Icon = TrayIconLogic.ShowTextWithBorder(_currentCount.ToString(), TrayIconLogic.DefaultTextColor, TrayIconLogic.WarningBorderColor);
+                    {
+                        _notifyIcon.Icon = Resources.Stretching;
+                    }
                 }
             }
 
