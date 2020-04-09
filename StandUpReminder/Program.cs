@@ -32,9 +32,9 @@ namespace StandUpReminder
 
             private MenuItem _statusMenu;
             private MenuItem _timeLeftMenu;
-            
+
             private MenuItem _pauseMenu;
-            
+
             private MenuItem _symbolMenu;
             private MenuItem _notificationMenu;
             private MenuItem _settingsMenu;
@@ -50,6 +50,7 @@ namespace StandUpReminder
                 InitMenus();
                 _timerClass = TimerClass.Instance;
                 _timerClass.TimeEvent += OnTimeEvent;
+                StretchingLogic stretchingLogic = new StretchingLogic();
                 StartTask();
             }
 
@@ -61,17 +62,17 @@ namespace StandUpReminder
                     Break = true,
                     DefaultItem = true
                 };
-                
+
                 //TimeLeftMenu "00:00"
                 _timeLeftMenu = new MenuItem();
 
                 //PauseMenu (un-)pauses the timer
                 _pauseMenu = new MenuItem(Resources.PauseLabel, OnPausePressed);
-                
+
                 //Turn notification on/off
                 _notificationMenu = new MenuItem("Notification", OnChangeNotificationClicked) { Checked = true };
 
-                _symbolMenu = new MenuItem("Show time", OnSymbolChange){Checked = true};
+                _symbolMenu = new MenuItem("Show time", OnSymbolChange) { Checked = true };
 
                 //SettingsMenu containing notificationMenu
                 _settingsMenu = new MenuItem("Settings", new[]
@@ -115,11 +116,10 @@ namespace StandUpReminder
 
             private void OnTimeEvent(object sender, EventArgs e)
             {
-
                 lock (this)
                 {
                     _currentCount--;
-                    _timeLeftMenu.Text = $@"{(_currentCount/60),0:00}:{(_currentCount % 60),0:00}";
+                    _timeLeftMenu.Text = $@"{(_currentCount / 60),0:00}:{(_currentCount % 60),0:00}";
 
                     if (_currentCount == 0)
                     {
