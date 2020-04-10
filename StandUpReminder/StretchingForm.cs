@@ -9,10 +9,12 @@ namespace StandUpReminder
         public StretchingForm()
         {
             SetStyle(ControlStyles.SupportsTransparentBackColor, true);
+            this.Size = Screen.PrimaryScreen.WorkingArea.Size;
             this.BackColor = Color.Transparent;
-            this.BackgroundImage = global::StandUpReminder.Properties.Resources.MeditationLotus;
             this.TransparencyKey = Color.Transparent;
             this.Icon = Resources.Stretching;
+            
+
         }
 
         private void InitializeComponent()
@@ -21,16 +23,13 @@ namespace StandUpReminder
             // 
             // StretchingForm
             // 
-            this.BackgroundImage = global::StandUpReminder.Properties.Resources.MeditationLotus;
-            this.ClientSize = new System.Drawing.Size(1572, 920);
             this.Name = "StretchingForm";
             this.ResumeLayout(false);
-            //e.Graphics.DrawImage(Resources.MeditationLotus, 0, 0);
-
         }
 
         protected override void OnPaintBackground(PaintEventArgs e)
         {
+            e.Graphics.DrawImage(Resources.MeditationLotus, (this.Width/2-Resources.MeditationLotus.Width/2), (this.Height/2-Resources.MeditationLotus.Height/2));
         }
     }
 }
