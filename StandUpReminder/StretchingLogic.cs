@@ -1,26 +1,41 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using StandUpReminder.Annotations;
+using System;
+using System.ComponentModel;
+using System.Runtime.CompilerServices;
 using System.Windows.Forms;
 
 namespace StandUpReminder
 {
-    class StretchingLogic
+    public class StretchingLogic : INotifyPropertyChanged
     {
-        public const int MaxTime = 900;
+        public const int MaxWaitTime = 5;
+        public const int MaxShowTime = 5;
 
         private bool _enabled;
+
         private int _counter;
+
+        public int Counter
+        {
+            get { return _counter; }
+            set
+            {
+                _counter = value;
+                OnPropertyChanged();
+            }
+        }
+
+        private State currentState = State.WAITING;
+        private StretchingForm _stretchingForm;
 
         public bool Enabled
         {
-            get { return _enabled;}
-            set {
+            get { return _enabled; }
+            set
+            {
                 if (value)
                 {
-                    _counter = MaxTime;
+                    Counter = MaxWaitTime;
                     TimerClass.Instance.TimeEvent += OnTimeEvent;
                 }
                 else
@@ -30,12 +45,11 @@ namespace StandUpReminder
 
                 _enabled = value;
             }
-            
         }
 
         public StretchingLogic()
         {
-            _counter = 10;
+            Counter = 5;
             TimerClass.Instance.TimeEvent += OnTimeEvent;
         }
 
@@ -43,14 +57,47 @@ namespace StandUpReminder
         {
             lock (this)
             {
-                _counter--;
-                if (_counter == 0)
+                Counter--;
+                if (Counter == 0)
                 {
-                    StretchingForm stretchingForm = new StretchingForm();
-                    stretchingForm.Show();
-                    stretchingForm.WindowState = FormWindowState.Normal;
+                    if (currentState == State.SHOWN)
+                    {
+                        Counter = MaxWaitTime;
+                        _stretchingForm.Close();
+                        currentState = State.WAITING;
+                    }
+                    else
+                    {
+                        Counter = MaxShowTime;
+                        _stretchingForm = new StretchingForm(this, MaxShowTime);
+                        currentState = State.SHOWN;
+                        _stretchingForm.Show();
+                        _stretchingForm.WindowState = FormWindowState.Normal;
+                    }
                 }
-            }    
+
+            }
+        }
+
+        public void ResetCounter()
+        {
+            Counter = currentState == State.WAITING ? MaxWaitTime : MaxShowTime;
+        }
+
+        private enum State
+        {
+            WAITING,
+            SHOWN
+        }
+
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        [NotifyPropertyChangedInvocator]
+        protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

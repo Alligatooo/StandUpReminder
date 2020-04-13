@@ -48,6 +48,13 @@ namespace StandUpReminder
             public StandUpReminderApplicationContext()
             {
                 InitMenus();
+
+                //ExitHandler
+                Application.ApplicationExit += (s, e) =>
+                {
+                    this._notifyIcon.Visible = false;
+                    this._notifyIcon.Dispose();
+                };
                 _timerClass = TimerClass.Instance;
                 _timerClass.TimeEvent += OnTimeEvent;
                 StretchingLogic stretchingLogic = new StretchingLogic();
@@ -225,6 +232,7 @@ namespace StandUpReminder
                     Application.Exit();
                 }
             }
+            
         }
     }
 }
