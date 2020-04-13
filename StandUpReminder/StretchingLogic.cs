@@ -3,13 +3,12 @@ using System;
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Forms;
+using StandUpReminder.Properties;
 
 namespace StandUpReminder
 {
     public class StretchingLogic : INotifyPropertyChanged
     {
-        public const int MaxWaitTime = 5;
-        public const int MaxShowTime = 5;
 
         private bool _enabled;
 
@@ -35,7 +34,7 @@ namespace StandUpReminder
             {
                 if (value)
                 {
-                    Counter = MaxWaitTime;
+                    Counter = Settings.Default.StretchingIdeDuration;
                     TimerClass.Instance.TimeEvent += OnTimeEvent;
                 }
                 else
@@ -62,14 +61,14 @@ namespace StandUpReminder
                 {
                     if (currentState == State.SHOWN)
                     {
-                        Counter = MaxWaitTime;
+                        Counter = Settings.Default.StretchingIdeDuration;
                         _stretchingForm.Close();
                         currentState = State.WAITING;
                     }
                     else
                     {
-                        Counter = MaxShowTime;
-                        _stretchingForm = new StretchingForm(this, MaxShowTime);
+                        Counter = Settings.Default.StretchingShowDuration;
+                        _stretchingForm = new StretchingForm(this);
                         currentState = State.SHOWN;
                         _stretchingForm.Show();
                         _stretchingForm.WindowState = FormWindowState.Normal;
@@ -81,7 +80,7 @@ namespace StandUpReminder
 
         public void ResetCounter()
         {
-            Counter = currentState == State.WAITING ? MaxWaitTime : MaxShowTime;
+            Counter = currentState == State.WAITING ? Settings.Default.StretchingIdeDuration : Settings.Default.StretchingShowDuration;
         }
 
         private enum State
@@ -97,6 +96,8 @@ namespace StandUpReminder
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
+            if (propertyName == "Counter" && currentState == State.WAITING)
+                return;
             PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }

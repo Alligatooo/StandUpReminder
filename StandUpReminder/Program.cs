@@ -25,7 +25,6 @@ namespace StandUpReminder
             private NotifyIcon _notifyIcon;
             private ContextMenu _defaultContextMenu;
 
-            private bool _notificationAlert = true;
             private readonly TimerClass _timerClass;
 
             //Menus
@@ -39,11 +38,8 @@ namespace StandUpReminder
             private MenuItem _notificationMenu;
             private MenuItem _settingsMenu;
 
-            private const int MaxTimerActivity = 3600; //60 min
-            private const int MaxTimerPause = 300; //5 min
             private int _currentCount = 20;
             private bool _pause;
-            private bool _showTimer = true;
 
             public StandUpReminderApplicationContext()
             {
@@ -118,7 +114,8 @@ namespace StandUpReminder
             {
                 _symbolMenu.Text = _symbolMenu.Checked ? "Show icon" : "Show time";
                 _symbolMenu.Checked = !_symbolMenu.Checked;
-                _showTimer = _symbolMenu.Checked;
+                Settings.Default.ShowTimerTray = _symbolMenu.Checked;
+                Settings.Default.Save();
             }
 
             private void OnTimeEvent(object sender, EventArgs e)
@@ -133,18 +130,18 @@ namespace StandUpReminder
                         if (!_pause)
                         {
                             SendAlert(Resources.ActivityEnd);
-                            _currentCount = MaxTimerPause;
+                            _currentCount = Settings.Default.PauseDuration;
                         }
                         else
                         {
                             SendAlert(Resources.ActivityStart);
-                            _currentCount = MaxTimerActivity;
+                            _currentCount = Settings.Default.StandupIdleTime;
                         }
                         _pause = !_pause;
                         return;
                     }
 
-                    if (_showTimer)
+                    if (Settings.Default.ShowTimerTray)
                     {
                         //While _pause show "P"
                         if (_pause)
@@ -174,7 +171,7 @@ namespace StandUpReminder
 
             private void SendAlert(Stream soundStream)
             {
-                if (!_notificationAlert) return;
+                if (!Settings.Default.NotifactionAlertEnabled) return;
                 new SoundPlayer(soundStream).Play();
             }
 
@@ -203,7 +200,8 @@ namespace StandUpReminder
                     _notificationMenu.Checked = true;
                 }
 
-                _notificationAlert = _notificationMenu.Checked;
+                Settings.Default.NotifactionAlertEnabled = _notificationMenu.Checked;
+                Settings.Default.Save();
             }
 
             private void StartTask()
@@ -216,7 +214,7 @@ namespace StandUpReminder
                 var dialogResult = MessageBox.Show(Resources.RestartQuestionMessageBox, Resources.RestartCaptionMessageBox, MessageBoxButtons.YesNo);
                 if (dialogResult == DialogResult.Yes)
                 {
-                    _currentCount = _pause ? MaxTimerPause : MaxTimerActivity;
+                    _currentCount = _pause ? Settings.Default.PauseDuration : Settings.Default.StandupIdleTime;
                 }
             }
 

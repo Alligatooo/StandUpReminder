@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
 using StandUpReminder.Properties;
@@ -31,13 +32,16 @@ namespace StandUpReminder
             //this.Controls.Add(pictureBox1);
         }
 
-        public StretchingForm(StretchingLogic stretchingLogic, int maxShowTime)
+        public StretchingForm(StretchingLogic stretchingLogic)
         {
             stretchingLogic.PropertyChanged += (sender, args) =>
             {
                 if (args.PropertyName.Equals("Counter"))
                 {
-                    progressBar.Value = progressBar.Maximum - stretchingLogic.Counter;
+                    int counter = ((StretchingLogic) sender).Counter;
+
+                    Debug.WriteLine(progressBar.Maximum - counter);
+                    progressBar.Value = progressBar.Maximum - counter;
                 }
             };
             InitializeComponent();
@@ -55,7 +59,7 @@ namespace StandUpReminder
             this.Icon = Resources.Stretching;
 
             this._strechtingLogic = stretchingLogic;
-            progressBar.Maximum = maxShowTime;
+            progressBar.Maximum = Settings.Default.StretchingShowDuration;
 
 
             this.CenterToScreen();
