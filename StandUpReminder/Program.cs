@@ -3,6 +3,7 @@ using System;
 using System.Drawing;
 using System.IO;
 using System.Media;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace StandUpReminder
@@ -40,6 +41,11 @@ namespace StandUpReminder
 
             private int _currentCount = 20;
             private bool _pause;
+            private MenuItem _stretchingMenu;
+            private StretchingLogic _stretchingLogic;
+
+            [DllImport("user32.dll", CharSet = CharSet.Auto)]
+            private static extern bool DestroyIcon(IntPtr handle);
 
             public StandUpReminderApplicationContext()
             {
@@ -53,7 +59,8 @@ namespace StandUpReminder
                 };
                 _timerClass = TimerClass.Instance;
                 _timerClass.TimeEvent += OnTimeEvent;
-                StretchingLogic stretchingLogic = new StretchingLogic();
+                
+                _stretchingLogic = new StretchingLogic(){ Enabled = Settings.Default.StretchingReminderEnabled};
                 StartTask();
             }
 
@@ -73,7 +80,10 @@ namespace StandUpReminder
                 _pauseMenu = new MenuItem(Resources.PauseLabel, OnPausePressed);
 
                 //Turn notification on/off
-                _notificationMenu = new MenuItem("Notification", OnChangeNotificationClicked) { Checked = true };
+                _notificationMenu = new MenuItem("Notification", OnChangeNotificationClicked) { Checked = Settings.Default.NotifactionAlertEnabled };
+
+                //Turn notification on/off
+                _stretchingMenu = new MenuItem("Stretching Reminder", OnChangeStretchingMenuClicked) { Checked = Settings.Default.StretchingReminderEnabled };
 
                 _symbolMenu = new MenuItem("Show time", OnSymbolChange) { Checked = true };
 
@@ -81,6 +91,7 @@ namespace StandUpReminder
                 _settingsMenu = new MenuItem("Settings", new[]
                 {
                     _notificationMenu,
+                    _stretchingMenu,
                     _symbolMenu
                 });
 
@@ -110,6 +121,13 @@ namespace StandUpReminder
                 };
             }
 
+            private void OnChangeStretchingMenuClicked(object sender, EventArgs e)
+            {
+                _stretchingMenu.Checked = !_stretchingMenu.Checked;
+                Settings.Default.StretchingReminderEnabled = Settings.Default.StretchingReminderEnabled;
+                _stretchingLogic.Enabled = _stretchingMenu.Checked;
+            }
+
             private void OnSymbolChange(object sender, EventArgs e)
             {
                 _symbolMenu.Text = _symbolMenu.Checked ? "Show icon" : "Show time";
@@ -131,6 +149,13 @@ namespace StandUpReminder
                         {
                             SendAlert(Resources.ActivityEnd);
                             _currentCount = Settings.Default.PauseDuration;
+                            if (Settings.Default.ShowTimerTray)
+                            {
+
+                                _notifyIcon.Icon =
+                                    TrayIconLogic.ShowTextWithBorder("P", TrayIconLogic.DefaultTextColor,
+                                        Color.DeepSkyBlue);
+                            }
                         }
                         else
                         {
@@ -146,9 +171,6 @@ namespace StandUpReminder
                         //While _pause show "P"
                         if (_pause)
                         {
-                            _notifyIcon.Icon =
-                                TrayIconLogic.ShowTextWithBorder("P", TrayIconLogic.DefaultTextColor,
-                                    Color.DeepSkyBlue);
                             return;
                         }
 
@@ -161,6 +183,8 @@ namespace StandUpReminder
                         else
                             _notifyIcon.Icon = TrayIconLogic.ShowTextWithBorder(_currentCount.ToString(),
                                 TrayIconLogic.DefaultTextColor, TrayIconLogic.WarningBorderColor);
+
+                        DestroyIcon(_notifyIcon.Icon.Handle);
                     }
                     else
                     {

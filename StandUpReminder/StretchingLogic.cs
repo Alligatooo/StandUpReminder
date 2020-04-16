@@ -49,7 +49,6 @@ namespace StandUpReminder
         public StretchingLogic()
         {
             Counter = 5;
-            TimerClass.Instance.TimeEvent += OnTimeEvent;
         }
 
         private void OnTimeEvent(object sender, EventArgs e)
@@ -61,9 +60,9 @@ namespace StandUpReminder
                 {
                     if (currentState == State.SHOWN)
                     {
-                        Counter = Settings.Default.StretchingIdeDuration;
                         _stretchingForm.Close();
                         currentState = State.WAITING;
+                        Counter = Settings.Default.StretchingIdeDuration;
                     }
                     else
                     {

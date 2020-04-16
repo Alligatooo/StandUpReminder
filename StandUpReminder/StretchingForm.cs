@@ -1,4 +1,5 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Drawing;
 using System.Windows.Forms;
@@ -34,16 +35,7 @@ namespace StandUpReminder
 
         public StretchingForm(StretchingLogic stretchingLogic)
         {
-            stretchingLogic.PropertyChanged += (sender, args) =>
-            {
-                if (args.PropertyName.Equals("Counter"))
-                {
-                    int counter = ((StretchingLogic) sender).Counter;
-
-                    Debug.WriteLine(progressBar.Maximum - counter);
-                    progressBar.Value = progressBar.Maximum - counter;
-                }
-            };
+            stretchingLogic.PropertyChanged += OnPropertyChanged;
             InitializeComponent();
             //BackgroundColor
 
@@ -63,6 +55,17 @@ namespace StandUpReminder
 
 
             this.CenterToScreen();
+        }
+
+        private void OnPropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName.Equals("Counter"))
+            {
+                int counter = ((StretchingLogic)sender).Counter;
+
+                Debug.WriteLine(progressBar.Maximum - counter);
+                progressBar.Value = progressBar.Maximum - counter;
+            }
         }
 
 

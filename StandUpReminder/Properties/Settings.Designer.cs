@@ -73,7 +73,7 @@ namespace StandUpReminder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("900")]
+        [global::System.Configuration.DefaultSettingValueAttribute("10")]
         public int StretchingIdeDuration {
             get {
                 return ((int)(this["StretchingIdeDuration"]));
@@ -92,6 +92,18 @@ namespace StandUpReminder.Properties {
             }
             set {
                 this["ShowTimerTray"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("True")]
+        public bool StretchingReminderEnabled {
+            get {
+                return ((bool)(this["StretchingReminderEnabled"]));
+            }
+            set {
+                this["StretchingReminderEnabled"] = value;
             }
         }
     }

@@ -43,7 +43,9 @@ namespace StandUpReminder
             graphics.DrawRectangle(pen, 0, 0, 15, 15);
 
             IntPtr hIcon = bitmap.GetHicon();
-            return Icon.FromHandle(hIcon);
+
+            Icon icon = Icon.FromHandle(hIcon);
+            return icon;
         }
     }
 }
