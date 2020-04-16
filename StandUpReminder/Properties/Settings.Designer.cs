@@ -61,7 +61,7 @@ namespace StandUpReminder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("5")]
+        [global::System.Configuration.DefaultSettingValueAttribute("20")]
         public int StretchingShowDuration {
             get {
                 return ((int)(this["StretchingShowDuration"]));
@@ -73,7 +73,7 @@ namespace StandUpReminder.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("10")]
+        [global::System.Configuration.DefaultSettingValueAttribute("900")]
         public int StretchingIdeDuration {
             get {
                 return ((int)(this["StretchingIdeDuration"]));
